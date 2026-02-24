@@ -17,8 +17,14 @@ def get_zone_id(client, zone_name):
     raise ValueError(f'Hosted zone not found: {zone_name}')
 
 
-def upsert_a_record(zone_id, name, values, ttl=300, action='UPSERT', client=None):
+def upsert_a_record(
+        zone_id,
+        name,
+        values,
+        action='UPSERT',
+        client=None):
     '''Create or update an A record in a Route53 hosted zone'''
+    ttl = 300
     if client is None:
         client = boto3.client('route53')
 
@@ -54,11 +60,20 @@ def parse_args(argv=None):
     zone_group = parser.add_mutually_exclusive_group(required=True)
     zone_group.add_argument('--zone-id', help='Route53 hosted zone ID')
     zone_group.add_argument('--zone-name', help='Route53 hosted zone name')
-    parser.add_argument('--name', required=True, help='DNS record name (e.g. www.example.com)')
     parser.add_argument(
-        '--value', required=True, nargs='+', help='IP address(es) to set for the A record'
-    )
-    parser.add_argument('--ttl', type=int, default=300, help='TTL in seconds (default: 300)')
+        '--name',
+        required=True,
+        help='DNS record name (e.g. www.example.com)')
+    parser.add_argument(
+        '--value',
+        required=True,
+        nargs='+',
+        help='IP address(es) to set for the A record')
+    parser.add_argument(
+        '--ttl',
+        type=int,
+        default=300,
+        help='TTL in seconds (default: 300)')
     parser.add_argument(
         '--action',
         choices=['CREATE', 'UPSERT', 'DELETE'],
@@ -81,13 +96,14 @@ def main(argv=None):
         zone_id=zone_id,
         name=args.name,
         values=args.value,
-        ttl=args.ttl,
         action=args.action,
         client=client,
     )
     status = response['ChangeInfo']['Status']
     change_id = response['ChangeInfo']['Id']
-    print(f'Success: {args.action} A record "{args.name}" -> {args.value} | Status: {status} | ChangeId: {change_id}')
+    print(
+        f'''Success: {args.action} A record "{args.name}" -> {args.value}
+| Status: {status} | ChangeId: {change_id}''')
     return response
 
 

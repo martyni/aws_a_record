@@ -1,7 +1,7 @@
 '''
 Tests for aws_a_record CLI app
 '''
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
 import pytest
 from aws_a_record.app import get_zone_id, upsert_a_record, parse_args, main
 
@@ -58,7 +58,6 @@ def test_upsert_a_record():
         zone_id=MOCK_ZONE_ID,
         name='www.example.com',
         values=['1.2.3.4'],
-        ttl=60,
         action='UPSERT',
         client=client,
     )
@@ -72,7 +71,7 @@ def test_upsert_a_record():
                     'ResourceRecordSet': {
                         'Name': 'www.example.com.',
                         'Type': 'A',
-                        'TTL': 60,
+                        'TTL': 300,
                         'ResourceRecords': [{'Value': '1.2.3.4'}],
                     },
                 }
@@ -97,7 +96,8 @@ def test_upsert_a_record_multiple_values():
 
 def test_parse_args_zone_id():
     '''parse_args parses --zone-id correctly'''
-    args = parse_args(['--zone-id', MOCK_ZONE_ID, '--name', 'www.example.com', '--value', '1.2.3.4'])
+    args = parse_args(['--zone-id', MOCK_ZONE_ID, '--name',
+                      'www.example.com', '--value', '1.2.3.4'])
     assert args.zone_id == MOCK_ZONE_ID
     assert args.name == 'www.example.com'
     assert args.value == ['1.2.3.4']
@@ -107,7 +107,8 @@ def test_parse_args_zone_id():
 
 def test_parse_args_zone_name():
     '''parse_args parses --zone-name correctly'''
-    args = parse_args(['--zone-name', 'example.com', '--name', 'api.example.com', '--value', '10.0.0.1'])
+    args = parse_args(['--zone-name', 'example.com', '--name',
+                      'api.example.com', '--value', '10.0.0.1'])
     assert args.zone_name == 'example.com'
 
 
@@ -129,7 +130,8 @@ def test_main_with_zone_id(capsys):
     with patch('aws_a_record.app.boto3') as mock_boto3:
         mock_client = _mock_route53_client()
         mock_boto3.client.return_value = mock_client
-        main(['--zone-id', MOCK_ZONE_ID, '--name', 'www.example.com', '--value', '1.2.3.4'])
+        main(['--zone-id', MOCK_ZONE_ID, '--name',
+             'www.example.com', '--value', '1.2.3.4'])
     captured = capsys.readouterr()
     assert 'Success' in captured.out
     assert 'UPSERT' in captured.out
@@ -140,6 +142,7 @@ def test_main_with_zone_name(capsys):
     with patch('aws_a_record.app.boto3') as mock_boto3:
         mock_client = _mock_route53_client()
         mock_boto3.client.return_value = mock_client
-        main(['--zone-name', 'example.com', '--name', 'www.example.com', '--value', '1.2.3.4'])
+        main(['--zone-name', 'example.com', '--name',
+             'www.example.com', '--value', '1.2.3.4'])
     captured = capsys.readouterr()
     assert 'Success' in captured.out
