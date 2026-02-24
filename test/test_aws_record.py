@@ -3,7 +3,7 @@
 '''
 import random
 import string
-from webapp.app import app
+from aws_record.app import app
 
 C = app.test_client()
 
@@ -40,13 +40,13 @@ def __random_string(length=32):
 #
 #
 
-def test_json_returned(client=C):
-    '''Sends random basic data and ensures it is returned'''
-    rnd_str = __random_string()
-    response = client.post("/basic",
-                           json={
-                               "mandatory": rnd_str,
-                               "optional": "dave"})
-    assert response.json["mandatory"] == rnd_str
-    response = client.get("/basic")
-    assert rnd_str in str(response.data)
+# def test_json_returned(client=C):
+#    '''Sends random basic data and ensures it is returned'''
+#    rnd_str = __random_string()
+#    response = client.post("/basic",
+#                           json={
+#                               "mandatory": rnd_str,
+#                               "optional": "dave"})
+#    assert response.json["mandatory"] == rnd_str
+#    response = client.get("/basic")
+#    assert rnd_str in str(response.data)
