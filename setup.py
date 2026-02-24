@@ -77,6 +77,7 @@ setup(
         'console_scripts': [
             f"{meta_dict['name']}_web = webapp.app:main",
             f"{meta_dict['name']}   = myapp.app:main",
+            "aws_a_record = aws_a_record.app:main",
         ],
     },
 
